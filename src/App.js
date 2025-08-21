@@ -97,40 +97,64 @@ function App() {
     // TODO: Navigate to settings screen
   };
 
-  // Hide URL bar on iOS Safari
+  // Modern iOS Safari URL bar hiding
   useEffect(() => {
     const hideUrlBar = () => {
-      // Only on mobile Safari
-      if (/iPhone|iPad|iPod/.test(navigator.userAgent) && !window.MSStream) {
-        // Scroll to hide the URL bar
-        setTimeout(() => {
-          window.scrollTo(0, 1);
-        }, 100);
+      // Check if we're on iOS Safari
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      const isSafari = /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent);
+      
+      if (isIOS && isSafari) {
+        // Method 1: Request fullscreen if available
+        if (document.documentElement.requestFullscreen) {
+          document.documentElement.requestFullscreen().catch(() => {
+            // Fullscreen failed, try other methods
+          });
+        }
+        
+        // Method 2: Use visual viewport API if available
+        if (window.visualViewport) {
+          const viewport = window.visualViewport;
+          const resizeHandler = () => {
+            document.body.style.height = `${viewport.height}px`;
+          };
+          viewport.addEventListener('resize', resizeHandler);
+          resizeHandler(); // Initial call
+        }
+        
+        // Method 3: Set body height to fill available space
+        document.body.style.height = '100vh';
+        document.body.style.height = '100dvh'; // Dynamic viewport height
+        document.body.style.overflow = 'hidden';
       }
     };
 
-    // Hide on initial load
     hideUrlBar();
-
-    // Hide when orientation changes
-    window.addEventListener('orientationchange', hideUrlBar);
-    
-    return () => {
-      window.removeEventListener('orientationchange', hideUrlBar);
-    };
   }, []);
 
-  // Hide URL bar when starting breathing session
+  // Enhanced URL bar hiding for breathing sessions
   useEffect(() => {
     if (currentScreen === 'session') {
-      const hideUrlBarForSession = () => {
-        if (/iPhone|iPad|iPod/.test(navigator.userAgent) && !window.MSStream) {
-          setTimeout(() => {
-            window.scrollTo(0, 1);
-          }, 100);
-        }
-      };
-      hideUrlBarForSession();
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      
+      if (isIOS) {
+        // Force the browser to minimize UI by making content taller than viewport
+        const originalBodyHeight = document.body.style.height;
+        const originalBodyOverflow = document.body.style.overflow;
+        
+        document.body.style.height = '100vh';
+        document.body.style.height = '100dvh';
+        document.body.style.overflow = 'hidden';
+        
+        // Try to trigger minimal UI mode
+        window.scrollTo(0, 0);
+        
+        return () => {
+          // Restore original styles when leaving session
+          document.body.style.height = originalBodyHeight;
+          document.body.style.overflow = originalBodyOverflow;
+        };
+      }
     }
   }, [currentScreen]);
 

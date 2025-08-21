@@ -1,1 +1,24 @@
 /* App.css - now using Tailwind classes */
+
+/* iOS Safari URL bar hiding support */
+@supports (-webkit-touch-callout: none) {
+  /* iOS specific styles */
+  html, body {
+    height: 100vh;
+    height: 100dvh; /* Dynamic viewport height for mobile browsers */
+    overflow: hidden;
+  }
+  
+  /* Prevent overscroll bouncing */
+  body {
+    overscroll-behavior: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Ensure full viewport coverage */
+  #root {
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+  }
+}
