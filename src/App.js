@@ -5,7 +5,7 @@ function App() {
   const [selectedDuration, setSelectedDuration] = useState(60); // Default 1 minute in seconds
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [currentScreen, setCurrentScreen] = useState('start'); // 'start' | 'session' | 'complete'
-  const [selectedPattern, setSelectedPattern] = useState('naturalTaoist');
+  const [selectedPattern] = useState('naturalTaoist');
   
   // Load completed sessions from localStorage on app start
   const [completedBreaths, setCompletedBreaths] = useState(() => {
@@ -113,12 +113,12 @@ function App() {
   const BreathingSession = () => {
     const [isRunning, setIsRunning] = useState(true);
     const [showControls, setShowControls] = useState(false);
-    const [sessionStartTime, setSessionStartTime] = useState(Date.now());
+    const [sessionStartTime] = useState(Date.now());
     const [pausedTime, setPausedTime] = useState(0); // Track total paused time
     const [currentPhaseIndex, setCurrentPhaseIndex] = useState(0);
     const [animationProgress, setAnimationProgress] = useState(0); // 0 to 1
     const [displayTimeLeft, setDisplayTimeLeft] = useState(selectedDuration);
-    const [breathCount, setBreathCount] = useState(0);
+    const [, setBreathCount] = useState(0);
     const [lastCompletedCycle, setLastCompletedCycle] = useState(-1);
 
     const currentPattern = breathingPatterns[selectedPattern];
@@ -161,7 +161,6 @@ function App() {
         
         // Find current position in the cycle and count completed cycles
         const positionInCycle = elapsedTime % cycleDuration;
-        const completedCycles = Math.floor(elapsedTime / cycleDuration);
         
         // Count individual breaths (inhale + exhale = 1 breath)
         // For Natural Taoist: 4s inhale + 6s exhale = 10s per breath
@@ -218,7 +217,7 @@ function App() {
       }, 16); // ~60fps for smooth updates
 
       return () => clearInterval(interval);
-    }, [isRunning, sessionStartTime, pausedTime, selectedDuration, currentPattern, currentPhaseIndex]);
+    }, [isRunning, sessionStartTime, pausedTime, selectedDuration, currentPattern, currentPhaseIndex, lastCompletedCycle, completedBreaths, setCompletedBreaths, setCurrentScreen]);
 
     const formatTime = (seconds) => {
       const mins = Math.floor(seconds / 60);
