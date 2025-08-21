@@ -97,66 +97,23 @@ function App() {
     // TODO: Navigate to settings screen
   };
 
-  // Modern iOS Safari URL bar hiding
+  // Simple viewport adjustment for mobile browsers
   useEffect(() => {
-    const hideUrlBar = () => {
-      // Check if we're on iOS Safari
-      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-      const isSafari = /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent);
-      
-      if (isIOS && isSafari) {
-        // Method 1: Request fullscreen if available
-        if (document.documentElement.requestFullscreen) {
-          document.documentElement.requestFullscreen().catch(() => {
-            // Fullscreen failed, try other methods
-          });
-        }
-        
-        // Method 2: Use visual viewport API if available
-        if (window.visualViewport) {
-          const viewport = window.visualViewport;
-          const resizeHandler = () => {
-            document.body.style.height = `${viewport.height}px`;
-          };
-          viewport.addEventListener('resize', resizeHandler);
-          resizeHandler(); // Initial call
-        }
-        
-        // Method 3: Set body height to fill available space
-        document.body.style.height = '100vh';
-        document.body.style.height = '100dvh'; // Dynamic viewport height
-        document.body.style.overflow = 'hidden';
-      }
+    // Set consistent viewport handling
+    const setViewportHeight = () => {
+      const vh = window.innerHeight * 0.01;
+      document.documentElement.style.setProperty('--vh', `${vh}px`);
     };
 
-    hideUrlBar();
-  }, []);
+    setViewportHeight();
+    window.addEventListener('resize', setViewportHeight);
+    window.addEventListener('orientationchange', setViewportHeight);
 
-  // Enhanced URL bar hiding for breathing sessions
-  useEffect(() => {
-    if (currentScreen === 'session') {
-      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-      
-      if (isIOS) {
-        // Force the browser to minimize UI by making content taller than viewport
-        const originalBodyHeight = document.body.style.height;
-        const originalBodyOverflow = document.body.style.overflow;
-        
-        document.body.style.height = '100vh';
-        document.body.style.height = '100dvh';
-        document.body.style.overflow = 'hidden';
-        
-        // Try to trigger minimal UI mode
-        window.scrollTo(0, 0);
-        
-        return () => {
-          // Restore original styles when leaving session
-          document.body.style.height = originalBodyHeight;
-          document.body.style.overflow = originalBodyOverflow;
-        };
-      }
-    }
-  }, [currentScreen]);
+    return () => {
+      window.removeEventListener('resize', setViewportHeight);
+      window.removeEventListener('orientationchange', setViewportHeight);
+    };
+  }, []);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -320,7 +277,8 @@ function App() {
 
     return (
       <div 
-        className="relative w-screen h-screen bg-app-bg overflow-hidden max-w-sm mx-auto md:border-x md:border-app-btn-stroke cursor-pointer"
+        className="relative w-screen bg-app-bg overflow-hidden max-w-sm mx-auto md:border-x md:border-app-btn-stroke cursor-pointer"
+        style={{ height: 'calc(var(--vh, 1vh) * 100)' }}
         onClick={handleScreenTouch}
       >
 
@@ -373,7 +331,7 @@ function App() {
             {isRunning ? (
               /* Running State - Pause Button */
               <button
-                className="absolute bottom-48 left-1/2 transform -translate-x-1/2 w-14 h-14 rounded-full border flex items-center justify-center cursor-pointer transition-all duration-200 hover:scale-105 active:scale-95 z-10"
+                className="absolute bottom-32 left-1/2 transform -translate-x-1/2 w-14 h-14 rounded-full border flex items-center justify-center cursor-pointer transition-all duration-200 hover:scale-105 active:scale-95 z-10"
                 style={{
                   borderColor: '#404040',
                   backgroundColor: '#171717'
@@ -387,7 +345,7 @@ function App() {
               </button>
             ) : (
               /* Paused State - Play and Stop Buttons */
-              <div className="absolute bottom-48 left-1/2 transform -translate-x-1/2 flex items-center gap-8 z-10">
+              <div className="absolute bottom-32 left-1/2 transform -translate-x-1/2 flex items-center gap-8 z-10">
                 {/* Stop Button */}
                 <button
                   className="w-14 h-14 rounded-full border flex items-center justify-center cursor-pointer transition-all duration-200 hover:scale-105 active:scale-95"
@@ -421,7 +379,7 @@ function App() {
             )}
 
             {/* Countdown Timer */}
-            <div className="absolute bottom-24 left-1/2 transform -translate-x-1/2">
+            <div className="absolute bottom-16 left-1/2 transform -translate-x-1/2">
               <div className="px-6 py-3 bg-app-element-bg border border-app-btn-stroke rounded-full">
                 <span className="font-headline font-medium text-lg text-app-btn-bg">
                   {formatTime(displayTimeLeft)}
@@ -465,8 +423,8 @@ function App() {
     };
 
     return (
-      <div className="relative w-screen min-h-screen bg-app-bg overflow-hidden max-w-sm mx-auto md:border-x md:border-app-btn-stroke flex flex-col"
-           style={{ height: '100dvh' }}>
+      <div className="relative w-screen bg-app-bg overflow-hidden max-w-sm mx-auto md:border-x md:border-app-btn-stroke flex flex-col"
+           style={{ height: 'calc(var(--vh, 1vh) * 100)' }}>
         {/* Breath Count Display */}
         <div className="flex-none pt-6 pb-4 text-center">
           <div className="font-button font-bold text-5xl text-white leading-none">
@@ -478,7 +436,7 @@ function App() {
         </div>
 
         {/* Decorative Image */}
-        <div className="flex items-center justify-center px-8 py-4" style={{ height: 'calc(100dvh - 280px)' }}>
+        <div className="flex items-center justify-center px-8 py-4" style={{ height: 'calc(var(--vh, 1vh) * 100 - 280px)' }}>
           <img 
             src="/images/breath_end.png" 
             alt="Decorative breath element" 
@@ -532,7 +490,8 @@ function App() {
   }
 
   return (
-    <div className="relative w-screen h-screen bg-app-bg overflow-hidden max-w-sm mx-auto md:border-x md:border-app-btn-stroke">
+    <div className="relative w-screen bg-app-bg overflow-hidden max-w-sm mx-auto md:border-x md:border-app-btn-stroke" 
+         style={{ height: 'calc(var(--vh, 1vh) * 100)' }}>
       {/* Settings Icon */}
       <button 
         className="absolute top-6 right-6 w-14 h-14 border border-app-btn-stroke rounded-full bg-transparent text-app-headline flex items-center justify-center cursor-pointer transition-all duration-200 hover:bg-app-element-bg active:scale-95"
