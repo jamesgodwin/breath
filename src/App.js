@@ -97,6 +97,43 @@ function App() {
     // TODO: Navigate to settings screen
   };
 
+  // Hide URL bar on iOS Safari
+  useEffect(() => {
+    const hideUrlBar = () => {
+      // Only on mobile Safari
+      if (/iPhone|iPad|iPod/.test(navigator.userAgent) && !window.MSStream) {
+        // Scroll to hide the URL bar
+        setTimeout(() => {
+          window.scrollTo(0, 1);
+        }, 100);
+      }
+    };
+
+    // Hide on initial load
+    hideUrlBar();
+
+    // Hide when orientation changes
+    window.addEventListener('orientationchange', hideUrlBar);
+    
+    return () => {
+      window.removeEventListener('orientationchange', hideUrlBar);
+    };
+  }, []);
+
+  // Hide URL bar when starting breathing session
+  useEffect(() => {
+    if (currentScreen === 'session') {
+      const hideUrlBarForSession = () => {
+        if (/iPhone|iPad|iPod/.test(navigator.userAgent) && !window.MSStream) {
+          setTimeout(() => {
+            window.scrollTo(0, 1);
+          }, 100);
+        }
+      };
+      hideUrlBarForSession();
+    }
+  }, [currentScreen]);
+
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
