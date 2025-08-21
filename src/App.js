@@ -217,7 +217,7 @@ function App() {
       }, 16); // ~60fps for smooth updates
 
       return () => clearInterval(interval);
-    }, [isRunning, sessionStartTime, pausedTime, selectedDuration, currentPattern, currentPhaseIndex, lastCompletedCycle, completedBreaths, setCompletedBreaths, setCurrentScreen]);
+    }, [isRunning, sessionStartTime, pausedTime, currentPattern, currentPhaseIndex, lastCompletedCycle]);
 
     const formatTime = (seconds) => {
       const mins = Math.floor(seconds / 60);
