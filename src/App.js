@@ -223,16 +223,6 @@ function App() {
         className="relative w-screen h-screen bg-app-bg overflow-hidden max-w-sm mx-auto md:border-x md:border-app-btn-stroke cursor-pointer"
         onClick={handleScreenTouch}
       >
-        {/* Settings Icon */}
-        <button 
-          className="absolute top-6 right-6 w-14 h-14 border border-app-btn-stroke rounded-full bg-transparent text-app-headline flex items-center justify-center cursor-pointer transition-all duration-200 hover:bg-app-element-bg active:scale-95 z-10"
-          onClick={(e) => {
-            e.stopPropagation();
-            handleSettings();
-          }}
-        >
-          <img src="/images/slider.svg" alt="Settings" width="24" height="24" />
-        </button>
 
         {/* Breathing Animation */}
         <div className="absolute top-1/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
@@ -357,6 +347,14 @@ function App() {
 
     return (
       <div className="relative w-screen h-screen bg-app-bg overflow-hidden max-w-sm mx-auto md:border-x md:border-app-btn-stroke flex flex-col">
+        {/* Settings Icon */}
+        <button 
+          className="absolute top-6 right-6 w-14 h-14 border border-app-btn-stroke rounded-full bg-transparent text-app-headline flex items-center justify-center cursor-pointer transition-all duration-200 hover:bg-app-element-bg active:scale-95 z-10"
+          onClick={handleSettings}
+        >
+          <img src="/images/slider.svg" alt="Settings" width="24" height="24" />
+        </button>
+
         {/* Breath Count Display */}
         <div className="flex-none pt-6 pb-4 text-center">
           <div className="font-button font-bold text-5xl text-white leading-none">
