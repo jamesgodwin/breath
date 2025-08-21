@@ -359,7 +359,7 @@ function App() {
         </div>
 
         {/* Decorative Image */}
-        <div className="flex-1 flex items-center justify-center px-8 min-h-0">
+        <div className="flex items-center justify-center px-8 py-4" style={{ height: 'calc(100dvh - 280px)' }}>
           <img 
             src="/images/breath_end.png" 
             alt="Decorative breath element" 
