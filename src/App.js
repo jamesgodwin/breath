@@ -6,7 +6,26 @@ function App() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [currentScreen, setCurrentScreen] = useState('start'); // 'start' | 'session' | 'complete'
   const [selectedPattern, setSelectedPattern] = useState('naturalTaoist');
-  const [completedBreaths, setCompletedBreaths] = useState(0);
+  
+  // Load completed sessions from localStorage on app start
+  const [completedBreaths, setCompletedBreaths] = useState(() => {
+    try {
+      const saved = localStorage.getItem('taoistBreathSessions');
+      return saved ? parseInt(saved, 10) : 0;
+    } catch (error) {
+      console.log('Error loading saved sessions:', error);
+      return 0;
+    }
+  });
+
+  // Save to localStorage whenever completedBreaths changes
+  useEffect(() => {
+    try {
+      localStorage.setItem('taoistBreathSessions', completedBreaths.toString());
+    } catch (error) {
+      console.log('Error saving sessions:', error);
+    }
+  }, [completedBreaths]);
 
   // Breathing patterns configuration
   const breathingPatterns = {
@@ -105,6 +124,27 @@ function App() {
     const currentPattern = breathingPatterns[selectedPattern];
     const currentPhase = currentPattern.phases[currentPhaseIndex];
 
+    // Handle page visibility changes (background/foreground)
+    useEffect(() => {
+      const handleVisibilityChange = () => {
+        if (document.hidden) {
+          // Page is hidden (user switched tabs, minimized, etc.)
+          if (isRunning) {
+            setIsRunning(false);
+            setPauseStartTime(Date.now());
+            setShowControls(true); // Show controls so user can see paused state when they return
+          }
+        }
+        // Note: We don't auto-resume when page becomes visible - user should manually resume
+      };
+
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+
+      return () => {
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
+      };
+    }, [isRunning]);
+
     useEffect(() => {
       if (!isRunning) return;
 
@@ -135,7 +175,7 @@ function App() {
 
         // Check if session is complete
         if (remainingTime <= 0) {
-          // Increment the total session count (this would eventually be stored in localStorage)
+          // Increment the total session count (automatically saved to localStorage)
           const newSessionCount = completedBreaths + 1;
           setCompletedBreaths(newSessionCount);
           setCurrentScreen('complete');
@@ -340,9 +380,28 @@ function App() {
       setCurrentScreen('start');
     };
 
-    const handleShare = () => {
-      console.log('Share functionality - to be implemented');
-      // TODO: Implement share functionality
+    const handleShare = async () => {
+      const shareData = {
+        title: 'Natural Taoist Breath - Transform Your Mind in Minutes',
+        text: `🧘‍♂️ Just completed ${completedBreaths} breathing session${completedBreaths === 1 ? '' : 's'}!\n\n✨ Discovered the ancient art of Natural Taoist Breathing:\n• 4 seconds inhale → 6 seconds exhale\n• Instant calm & mental clarity\n• Reduces stress & anxiety naturally\n• Just minutes a day for profound results\n\n🌟 Experience the transformation yourself - try this free breathing app:`,
+        url: 'https://taoistbreath.com'
+      };
+
+      try {
+        if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+          await navigator.share(shareData);
+        } else {
+          // Fallback for browsers that don't support Web Share API
+          const shareText = `${shareData.text}\n\n${shareData.url}`;
+          await navigator.clipboard.writeText(shareText);
+          
+          // Optional: Show a brief success message
+          console.log('Share message copied to clipboard!');
+          // You could add a toast notification here in the future
+        }
+      } catch (error) {
+        console.log('Share cancelled or failed:', error);
+      }
     };
 
     return (
@@ -368,7 +427,7 @@ function App() {
         </div>
 
         {/* Buttons Container */}
-        <div className="flex-none pb-8 px-6 space-y-4">
+        <div className="flex-none pb-12 px-6 space-y-4">
           {/* Continue Button */}
           <button
             className="w-full h-12 rounded-full border flex items-center justify-center cursor-pointer transition-all duration-200 hover:scale-105 active:scale-95"
