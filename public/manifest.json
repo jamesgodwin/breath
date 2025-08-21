@@ -1,0 +1,29 @@
+{
+  "short_name": "Taoist Breath",
+  "name": "Taoist Breath - Transform Your Mind in Minutes",
+  "description": "Discover the ancient art of Natural Taoist Breathing. 4 seconds inhale → 6 seconds exhale for instant calm, mental clarity, and stress relief.",
+  "icons": [
+    {
+      "src": "favicons/favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "favicons/android-icon-192x192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "favicons/android-icon-512x512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#141414",
+  "background_color": "#141414",
+  "scope": "/",
+  "categories": ["health", "lifestyle", "medical", "wellness"]
+}

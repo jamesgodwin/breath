@@ -79,7 +79,7 @@ pids
 
 # gatsby files
 .cache/
-public
+# public (commented out - needed for React apps)
 
 # Storybook build outputs
 .out
