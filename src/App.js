@@ -346,15 +346,8 @@ function App() {
     };
 
     return (
-      <div className="relative w-screen h-screen bg-app-bg overflow-hidden max-w-sm mx-auto md:border-x md:border-app-btn-stroke flex flex-col">
-        {/* Settings Icon */}
-        <button 
-          className="absolute top-6 right-6 w-14 h-14 border border-app-btn-stroke rounded-full bg-transparent text-app-headline flex items-center justify-center cursor-pointer transition-all duration-200 hover:bg-app-element-bg active:scale-95 z-10"
-          onClick={handleSettings}
-        >
-          <img src="/images/slider.svg" alt="Settings" width="24" height="24" />
-        </button>
-
+      <div className="relative w-screen min-h-screen bg-app-bg overflow-hidden max-w-sm mx-auto md:border-x md:border-app-btn-stroke flex flex-col"
+           style={{ height: '100dvh' }}>
         {/* Breath Count Display */}
         <div className="flex-none pt-6 pb-4 text-center">
           <div className="font-button font-bold text-5xl text-white leading-none">
@@ -366,20 +359,16 @@ function App() {
         </div>
 
         {/* Decorative Image */}
-        <div className="flex-none flex items-center justify-center px-8 py-4">
+        <div className="flex-1 flex items-center justify-center px-8 min-h-0">
           <img 
             src="/images/breath_end.png" 
             alt="Decorative breath element" 
-            className="w-auto h-auto object-contain"
-            style={{ maxWidth: '120px', maxHeight: '120px' }}
+            className="object-contain max-w-full max-h-full"
           />
         </div>
 
-        {/* Spacer */}
-        <div className="flex-1 min-h-0"></div>
-
         {/* Buttons Container */}
-        <div className="flex-none pb-6 px-6 space-y-3">
+        <div className="flex-none pb-8 px-6 space-y-4">
           {/* Continue Button */}
           <button
             className="w-full h-12 rounded-full border flex items-center justify-center cursor-pointer transition-all duration-200 hover:scale-105 active:scale-95"
