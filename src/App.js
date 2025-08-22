@@ -521,7 +521,7 @@ function App() {
           className="overflow-y-auto"
           style={{ 
             height: 'calc(var(--vh, 1vh) * 100)',
-            paddingTop: '105px',
+            paddingTop: window.navigator.standalone ? '140px' : '105px',
             paddingBottom: '24px',
             paddingLeft: '24px',
             paddingRight: '24px'
