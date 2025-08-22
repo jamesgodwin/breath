@@ -283,7 +283,6 @@ function App() {
           // Hold at current position - don't change animationProgress
           // Calculate countdown for hold phases: Hold, 3, 2, 1
           const timeRemainingInPhase = currentPattern.phases[targetPhaseIndex].duration - phaseElapsedTime;
-          const phaseDuration = currentPattern.phases[targetPhaseIndex].duration;
           
           if (phaseElapsedTime < 1) {
             // First second: show "Hold"
