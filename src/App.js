@@ -327,7 +327,6 @@ function App() {
         // Update phase if needed
         if (targetPhaseIndex !== currentPhaseIndex) {
           const newPhase = currentPattern.phases[targetPhaseIndex];
-          const prevPhase = currentPattern.phases[currentPhaseIndex];
           
           // Trigger audio on phase transitions
           if (newPhase.type === 'inhale') {
