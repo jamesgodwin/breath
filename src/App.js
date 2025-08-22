@@ -68,7 +68,7 @@ function App() {
       ]
     },
     embryonicBreathing: {
-      name: "Embryonic Breathing (Huiyin focus)",
+      name: "Embryonic Breathing (Deep focus)",
       subtitle: "Inhale 6s → Hold 2s → Exhale 6s → Hold 2s", 
       description: "Classic Taoist rhythm for centring and focus.",
       phases: [
