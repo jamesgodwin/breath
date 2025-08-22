@@ -44,6 +44,25 @@ function App() {
     }
   }, [selectedPattern]);
 
+  // Preload SVG icons for instant display
+  useEffect(() => {
+    const iconPaths = [
+      '/images/pause.svg',
+      '/images/play.svg', 
+      '/images/stop.svg',
+      '/images/slider.svg',
+      '/images/close.svg',
+      '/images/share.svg',
+      '/images/chevron-up.svg',
+      '/images/chevron-down.svg'
+    ];
+
+    // Preload each icon
+    iconPaths.forEach(path => {
+      const img = new Image();
+      img.src = path;
+    });
+  }, []);
 
   // Breathing patterns configuration
   const breathingPatterns = {
