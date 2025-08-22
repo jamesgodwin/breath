@@ -10,7 +10,7 @@ A modern React-based breathing meditation app that brings the ancient wisdom of 
 
 ## 🌟 Live Demo
 
-[Try the app now →](https://taoistbreath.com) *(Add your deployment URL here)*
+[Try the app now →](https://taoistbreath.com) taoistbreath.com
 
 ## ✨ Features
 
@@ -18,19 +18,8 @@ A modern React-based breathing meditation app that brings the ancient wisdom of 
 - **Natural Taoist Breath**: 4 seconds inhale → 6 seconds exhale (promotes calm & balance)
 - **Wu Wei Balance**: Box breathing (4-4-4-4) for focused meditation
 
-### 🔊 **Audio Feedback**
-- Web Audio API integration with synthesized transition tones
-- C5 (523Hz) for inhale phases, G4 (392Hz) for exhale phases
-- Adjustable volume controls with smooth fade-in/fade-out
-
-### 📳 **Haptic Feedback**
-- Gentle 50ms vibrations on inhale phase start
-- Works on mobile devices with Vibration API support
-- Device detection with intelligent UI hiding for unsupported browsers
-
 ### ⚙️ **Customizable Experience**
-- Toggle audio and haptic feedback independently
-- Volume slider for personalized sound levels
+- Multiple breathing pattern selection
 - Settings persist across sessions via localStorage
 - Duration selector: 30 seconds to 20 minutes
 
@@ -99,8 +88,6 @@ public/
 
 - **Framework**: React 19.1.1 with functional components and hooks
 - **Styling**: Tailwind CSS 3.4.17 with custom design system
-- **Audio**: Web Audio API for real-time sound synthesis
-- **Haptics**: Vibration API for mobile tactile feedback
 - **State Management**: React hooks with localStorage persistence
 - **Build Tool**: Create React App with zero-configuration setup
 - **PWA**: Service worker and manifest for app-like experience
@@ -114,12 +101,10 @@ public/
 
 ## 🌐 Browser Support
 
-- **Chrome**: Full support including haptic feedback
-- **Safari**: Full support on iOS with haptic feedback on physical devices
-- **Firefox**: Audio and visual features (haptic feedback varies by device)
-- **Edge**: Full audio and visual support
-
-**Note**: Haptic feedback requires a mobile device; it won't work in desktop browsers or simulators.
+- **Chrome**: Full support for all features
+- **Safari**: Full support on all devices
+- **Firefox**: Full support for all features
+- **Edge**: Full support for all features
 
 ## 🎨 Customization
 
@@ -152,7 +137,6 @@ We welcome contributions! Here's how you can help:
 ### Development Guidelines
 
 - Follow the existing code style and component patterns
-- Test audio and haptic features on actual mobile devices
 - Maintain the precise timing system when modifying breath logic
 - Use existing Tailwind classes and custom CSS variables
 - Update this README if adding new features

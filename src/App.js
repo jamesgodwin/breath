@@ -5,38 +5,15 @@ function App() {
   const [selectedDuration, setSelectedDuration] = useState(60); // Default 1 minute in seconds
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [currentScreen, setCurrentScreen] = useState('start'); // 'start' | 'session' | 'complete' | 'settings'
-  const [selectedPattern] = useState('naturalTaoist');
-  
-  // Audio and haptic settings
-  const [audioEnabled, setAudioEnabled] = useState(() => {
+  const [selectedPattern, setSelectedPattern] = useState(() => {
     try {
-      const saved = localStorage.getItem('taoistBreathAudioEnabled');
-      return saved ? JSON.parse(saved) : false;
+      const saved = localStorage.getItem('taoistBreathSelectedPattern');
+      return saved ? saved : 'naturalTaoist';
     } catch (error) {
-      return false;
+      return 'naturalTaoist';
     }
   });
   
-  const [hapticEnabled, setHapticEnabled] = useState(() => {
-    try {
-      const saved = localStorage.getItem('taoistBreathHapticEnabled');
-      return saved ? JSON.parse(saved) : false;
-    } catch (error) {
-      return false;
-    }
-  });
-  
-  const [audioVolume, setAudioVolume] = useState(() => {
-    try {
-      const saved = localStorage.getItem('taoistBreathAudioVolume');
-      return saved ? parseFloat(saved) : 0.3;
-    } catch (error) {
-      return 0.3;
-    }
-  });
-  
-  // Audio context for sound generation
-  const [audioContext, setAudioContext] = useState(null);
   
   // Load completed sessions from localStorage on app start
   const [completedBreaths, setCompletedBreaths] = useState(() => {
@@ -58,105 +35,65 @@ function App() {
     }
   }, [completedBreaths]);
 
-  // Save audio/haptic settings to localStorage
-  useEffect(() => {
-    try {
-      localStorage.setItem('taoistBreathAudioEnabled', JSON.stringify(audioEnabled));
-    } catch (error) {
-      console.log('Error saving audio setting:', error);
-    }
-  }, [audioEnabled]);
 
   useEffect(() => {
     try {
-      localStorage.setItem('taoistBreathHapticEnabled', JSON.stringify(hapticEnabled));
+      localStorage.setItem('taoistBreathSelectedPattern', selectedPattern);
     } catch (error) {
-      console.log('Error saving haptic setting:', error);
+      console.log('Error saving selected pattern:', error);
     }
-  }, [hapticEnabled]);
+  }, [selectedPattern]);
 
-  useEffect(() => {
-    try {
-      localStorage.setItem('taoistBreathAudioVolume', audioVolume.toString());
-    } catch (error) {
-      console.log('Error saving audio volume:', error);
-    }
-  }, [audioVolume]);
-
-  // Initialize audio context on first user interaction
-  const initializeAudioContext = () => {
-    if (!audioContext && audioEnabled) {
-      try {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        setAudioContext(ctx);
-        return ctx;
-      } catch (error) {
-        console.log('Audio context not supported:', error);
-        return null;
-      }
-    }
-    return audioContext;
-  };
-
-  // Generate transition sound
-  const playTransitionSound = (frequency = 440, duration = 0.1) => {
-    if (!audioEnabled) return;
-    
-    const ctx = initializeAudioContext();
-    if (!ctx) return;
-
-    try {
-      const oscillator = ctx.createOscillator();
-      const gainNode = ctx.createGain();
-      
-      oscillator.connect(gainNode);
-      gainNode.connect(ctx.destination);
-      
-      oscillator.frequency.setValueAtTime(frequency, ctx.currentTime);
-      oscillator.type = 'sine';
-      
-      gainNode.gain.setValueAtTime(0, ctx.currentTime);
-      gainNode.gain.linearRampToValueAtTime(audioVolume * 0.1, ctx.currentTime + 0.01);
-      gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
-      
-      oscillator.start(ctx.currentTime);
-      oscillator.stop(ctx.currentTime + duration);
-    } catch (error) {
-      console.log('Error playing sound:', error);
-    }
-  };
-
-  // Trigger haptic feedback
-  const triggerHaptic = () => {
-    if (!hapticEnabled) return;
-    
-    try {
-      if (navigator.vibrate) {
-        navigator.vibrate(50); // 50ms gentle vibration
-      }
-    } catch (error) {
-      console.log('Vibration not supported:', error);
-    }
-  };
 
   // Breathing patterns configuration
   const breathingPatterns = {
     naturalTaoist: {
       name: "Natural Taoist Breath",
       subtitle: "Inhale 4s → Exhale 6s",
+      description: "It's the most fundamental Taoist practice. Simple, calming, and safe for anyone.",
       phases: [
         { type: 'inhale', duration: 4, text: 'Inhale' },
         { type: 'exhale', duration: 6, text: 'Exhale' }
       ]
     },
     boxBreathing: {
-      name: "Wu Wei Balance", 
+      name: "Box Breathing (Wu Wei Balance)", 
       subtitle: "Inhale 4s → Hold 4s → Exhale 4s → Hold 4s",
+      description: "Restores balance, steadiness.",
       phases: [
         { type: 'inhale', duration: 4, text: 'Inhale' },
         { type: 'hold', duration: 4, text: 'Hold' },
         { type: 'exhale', duration: 4, text: 'Exhale' },
         { type: 'hold', duration: 4, text: 'Hold' }
+      ]
+    },
+    embryonicBreathing: {
+      name: "Embryonic Breathing (Huiyin focus)",
+      subtitle: "Inhale 6s → Hold 2s → Exhale 6s → Hold 2s", 
+      description: "Classic Taoist rhythm for centring and longevity.",
+      phases: [
+        { type: 'inhale', duration: 6, text: 'Inhale' },
+        { type: 'hold', duration: 2, text: 'Hold' },
+        { type: 'exhale', duration: 6, text: 'Exhale' },
+        { type: 'hold', duration: 2, text: 'Hold' }
+      ]
+    },
+    microcosmicOrbit: {
+      name: "Microcosmic Orbit (Circulation breath)",
+      subtitle: "Inhale 6s (rise) → Exhale 6s (descend).",
+      description: "Energy Circulation",
+      phases: [
+        { type: 'inhale', duration: 6, text: 'Inhale' },
+        { type: 'exhale', duration: 6, text: 'Exhale' }
+      ]
+    },
+    cleansingBreath: {
+      name: "Cleansing Breath",
+      subtitle: "Inhale 4s → Exhale 8s",
+      description: "Used for releasing stress and calming heart-mind.",
+      phases: [
+        { type: 'inhale', duration: 4, text: 'Inhale' },
+        { type: 'exhale', duration: 8, text: 'Exhale' }
       ]
     }
   };
@@ -326,16 +263,6 @@ function App() {
 
         // Update phase if needed
         if (targetPhaseIndex !== currentPhaseIndex) {
-          const newPhase = currentPattern.phases[targetPhaseIndex];
-          
-          // Trigger audio on phase transitions
-          if (newPhase.type === 'inhale') {
-            playTransitionSound(523, 0.15); // C5 note for inhale
-            triggerHaptic(); // Haptic feedback on inhale start
-          } else if (newPhase.type === 'exhale') {
-            playTransitionSound(392, 0.15); // G4 note for exhale
-          }
-          
           setCurrentPhaseIndex(targetPhaseIndex);
         }
 
@@ -452,8 +379,10 @@ function App() {
             {isRunning ? (
               /* Running State - Pause Button */
               <button
-                className="absolute bottom-32 left-1/2 transform -translate-x-1/2 w-14 h-14 rounded-full border flex items-center justify-center cursor-pointer transition-all duration-200 hover:scale-105 active:scale-95 z-10"
+                className="absolute bottom-32 left-1/2 transform -translate-x-1/2 rounded-full border flex items-center justify-center cursor-pointer transition-all duration-200 hover:scale-105 active:scale-95 z-10"
                 style={{
+                  width: '56px',
+                  height: '56px',
                   borderColor: '#404040',
                   backgroundColor: '#171717'
                 }}
@@ -465,27 +394,14 @@ function App() {
                 <img src="/images/pause.svg" alt="Pause" width="24" height="24" />
               </button>
             ) : (
-              /* Paused State - Play and Stop Buttons */
-              <div className="absolute bottom-32 left-1/2 transform -translate-x-1/2 flex items-center gap-8 z-10">
-                {/* Stop Button */}
+              /* Paused State - Centered Play Button with Stop Button to Left */
+              <>
+                {/* Play Button - Centered above timer */}
                 <button
-                  className="w-14 h-14 rounded-full border flex items-center justify-center cursor-pointer transition-all duration-200 hover:scale-105 active:scale-95"
+                  className="absolute bottom-32 left-1/2 transform -translate-x-1/2 rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 hover:scale-105 active:scale-95 z-10"
                   style={{
-                    borderColor: '#404040',
-                    backgroundColor: '#171717'
-                  }}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleStop();
-                  }}
-                >
-                  <img src="/images/stop.svg" alt="Stop" width="24" height="24" />
-                </button>
-
-                {/* Play Button */}
-                <button
-                  className="w-24 h-24 rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 hover:scale-105 active:scale-95"
-                  style={{
+                    width: '70px',
+                    height: '70px',
                     backgroundColor: '#E5E5E5',
                     border: 'none'
                   }}
@@ -494,9 +410,27 @@ function App() {
                     togglePause();
                   }}
                 >
-                  <img src="/images/play.svg" alt="Play" width="45" height="45" />
+                  <img src="/images/play.svg" alt="Play" width="32" height="32" />
                 </button>
-              </div>
+
+                {/* Stop Button - Offset to the left */}
+                <button
+                  className="absolute bottom-32 left-1/2 transform -translate-x-1/2 rounded-full border flex items-center justify-center cursor-pointer transition-all duration-200 hover:scale-105 active:scale-95 z-10"
+                  style={{
+                    width: '56px',
+                    height: '56px',
+                    borderColor: '#404040',
+                    backgroundColor: '#171717',
+                    marginLeft: '-80px'
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleStop();
+                  }}
+                >
+                  <img src="/images/stop.svg" alt="Stop" width="24" height="24" />
+                </button>
+              </>
             )}
 
             {/* Countdown Timer */}
@@ -515,133 +449,99 @@ function App() {
 
   // Settings Screen Component
   const SettingsScreen = () => {
-    const handleBack = () => {
+    const handleClose = () => {
       setCurrentScreen('start');
     };
 
-    const toggleAudio = () => {
-      setAudioEnabled(!audioEnabled);
+    const handlePatternSelect = (patternKey) => {
+      setSelectedPattern(patternKey);
     };
-
-    const toggleHaptic = () => {
-      setHapticEnabled(!hapticEnabled);
-    };
-
-    const handleVolumeChange = (e) => {
-      setAudioVolume(parseFloat(e.target.value));
-    };
-
-    // Check if vibration is supported
-    const vibrationSupported = 'vibrate' in navigator;
 
     return (
-      <div className="relative w-screen bg-app-bg overflow-hidden max-w-sm mx-auto md:border-x md:border-app-btn-stroke flex flex-col"
-           style={{ height: 'calc(var(--vh, 1vh) * 100)' }}>
+      <div 
+        className="relative w-screen max-w-sm mx-auto md:border-x md:border-app-btn-stroke"
+        style={{ 
+          height: 'calc(var(--vh, 1vh) * 100)',
+          backgroundColor: '#141414'
+        }}
+      >
         
-        {/* Header */}
-        <div className="flex-none pt-6 pb-4 px-6 flex items-center">
-          <button
-            className="w-10 h-10 rounded-full border border-app-btn-stroke bg-transparent flex items-center justify-center cursor-pointer transition-all duration-200 hover:bg-app-element-bg active:scale-95"
-            onClick={handleBack}
-          >
-            <img src="/images/chevron-up.svg" alt="Back" width="16" height="16" style={{ transform: 'rotate(-90deg)' }} />
-          </button>
-          <h1 className="font-headline font-semibold text-xl text-app-headline ml-4">
-            Settings
-          </h1>
-        </div>
+        {/* Close Button - Fixed position */}
+        <button
+          className="absolute z-10 rounded-full border flex items-center justify-center cursor-pointer transition-all duration-200 hover:scale-105 active:scale-95"
+          style={{
+            top: '24px',
+            right: '20px',
+            width: '56px',
+            height: '56px',
+            borderColor: '#404040',
+            backgroundColor: 'transparent'
+          }}
+          onClick={handleClose}
+        >
+          <img src="/images/close.svg" alt="Close" width="24" height="24" />
+        </button>
 
-        {/* Settings Content */}
-        <div className="flex-1 px-6 space-y-6">
+        {/* Scrollable Content */}
+        <div 
+          className="overflow-y-auto"
+          style={{ 
+            height: 'calc(var(--vh, 1vh) * 100)',
+            paddingTop: '105px',
+            paddingBottom: '24px',
+            paddingLeft: '24px',
+            paddingRight: '24px'
+          }}
+        >
           
-          {/* Sound Settings */}
-          <div className="space-y-4">
-            <h2 className="font-headline font-medium text-lg text-app-headline">
-              Sound
-            </h2>
-            
-            {/* Audio Toggle */}
-            <div className="flex items-center justify-between">
-              <span className="font-body text-base text-app-body">
-                Transition Sounds
-              </span>
-              <button
-                className={`w-12 h-6 rounded-full border transition-all duration-200 ${
-                  audioEnabled 
-                    ? 'bg-app-btn-bg border-app-btn-bg' 
-                    : 'bg-app-element-bg border-app-btn-stroke'
-                }`}
-                onClick={toggleAudio}
+          {/* Breathing Exercise Cards */}
+          <div style={{ width: '342px' }}>
+            {Object.entries(breathingPatterns).map(([key, pattern], index) => (
+              <div
+                key={key}
+                className="rounded-lg border cursor-pointer transition-all duration-200 hover:scale-[1.02] active:scale-98"
+                style={{
+                  padding: '12px',
+                  marginBottom: index === Object.keys(breathingPatterns).length - 1 ? '0' : '18px',
+                  backgroundColor: selectedPattern === key ? '#171717' : 'transparent',
+                  borderColor: selectedPattern === key ? '#f5f5f5' : '#404040',
+                  minHeight: selectedPattern === key && key === 'naturalTaoist' ? '117px' : 'auto'
+                }}
+                onClick={() => handlePatternSelect(key)}
               >
-                <div
-                  className={`w-5 h-5 rounded-full bg-white transition-transform duration-200 ${
-                    audioEnabled ? 'translate-x-6' : 'translate-x-0.5'
-                  }`}
-                />
-              </button>
-            </div>
-
-            {/* Volume Control */}
-            {audioEnabled && (
-              <div className="space-y-2">
-                <label className="font-body text-sm text-app-body">
-                  Volume
-                </label>
-                <input
-                  type="range"
-                  min="0"
-                  max="1"
-                  step="0.1"
-                  value={audioVolume}
-                  onChange={handleVolumeChange}
-                  className="w-full h-2 bg-app-element-bg rounded-lg appearance-none cursor-pointer slider"
-                />
-              </div>
-            )}
-          </div>
-
-          {/* Haptic Feedback Settings */}
-          {vibrationSupported && (
-            <div className="space-y-4">
-              <h2 className="font-headline font-medium text-lg text-app-headline">
-                Haptic Feedback
-              </h2>
-              
-              <div className="flex items-center justify-between">
-                <span className="font-body text-base text-app-body">
-                  Vibrate on Inhale
-                </span>
-                <button
-                  className={`w-12 h-6 rounded-full border transition-all duration-200 ${
-                    hapticEnabled 
-                      ? 'bg-app-btn-bg border-app-btn-bg' 
-                      : 'bg-app-element-bg border-app-btn-stroke'
-                  }`}
-                  onClick={toggleHaptic}
+                <h3 
+                  className="font-headline font-semibold"
+                  style={{ 
+                    fontSize: '18px', 
+                    color: '#f5f5f5',
+                    marginBottom: '4px'
+                  }}
                 >
-                  <div
-                    className={`w-5 h-5 rounded-full bg-white transition-transform duration-200 ${
-                      hapticEnabled ? 'translate-x-6' : 'translate-x-0.5'
-                    }`}
-                  />
-                </button>
+                  {pattern.name}
+                </h3>
+                <p 
+                  className="font-body"
+                  style={{ 
+                    fontSize: '14px', 
+                    color: '#a3a3a3',
+                    lineHeight: '20px',
+                    marginBottom: '4px'
+                  }}
+                >
+                  {pattern.subtitle}
+                </p>
+                <p 
+                  className="font-body"
+                  style={{ 
+                    fontSize: '14px', 
+                    color: '#a3a3a3',
+                    lineHeight: '20px'
+                  }}
+                >
+                  {pattern.description}
+                </p>
               </div>
-            </div>
-          )}
-
-          {/* Pattern Info */}
-          <div className="space-y-4">
-            <h2 className="font-headline font-medium text-lg text-app-headline">
-              Current Pattern
-            </h2>
-            <div className="p-4 bg-app-element-bg border border-app-btn-stroke rounded-lg">
-              <h3 className="font-headline font-medium text-base text-app-btn-bg">
-                {breathingPatterns[selectedPattern].name}
-              </h3>
-              <p className="font-body text-sm text-app-body mt-1">
-                {breathingPatterns[selectedPattern].subtitle}
-              </p>
-            </div>
+            ))}
           </div>
         </div>
       </div>
