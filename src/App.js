@@ -2,7 +2,14 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 
 function App() {
-  const [selectedDuration, setSelectedDuration] = useState(60); // Default 1 minute in seconds
+  const [selectedDuration, setSelectedDuration] = useState(() => {
+    try {
+      const saved = localStorage.getItem('taoistBreathSelectedDuration');
+      return saved ? parseInt(saved, 10) : 60; // Default 1 minute in seconds
+    } catch (error) {
+      return 60;
+    }
+  });
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [currentScreen, setCurrentScreen] = useState('start'); // 'start' | 'session' | 'complete' | 'settings'
   const [selectedPattern, setSelectedPattern] = useState(() => {
@@ -43,6 +50,15 @@ function App() {
       console.log('Error saving selected pattern:', error);
     }
   }, [selectedPattern]);
+
+  // Save selected duration to localStorage whenever it changes
+  useEffect(() => {
+    try {
+      localStorage.setItem('taoistBreathSelectedDuration', selectedDuration.toString());
+    } catch (error) {
+      console.log('Error saving selected duration:', error);
+    }
+  }, [selectedDuration]);
 
   // Preload SVG icons for instant display
   useEffect(() => {
