@@ -617,7 +617,12 @@ function App() {
       <div className="relative w-screen bg-app-bg overflow-hidden max-w-sm mx-auto md:border-x md:border-app-btn-stroke flex flex-col"
            style={{ height: 'calc(var(--vh, 1vh) * 100)' }}>
         {/* Breath Count Display */}
-        <div className="flex-none pt-6 pb-4 text-center">
+        <div 
+          className="flex-none pb-4 text-center"
+          style={{
+            paddingTop: window.navigator.standalone ? '60px' : '24px'
+          }}
+        >
           <div className="font-button font-bold text-5xl text-white leading-none">
             {completedBreaths}
           </div>
