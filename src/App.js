@@ -504,8 +504,8 @@ function App() {
         <button
           className="absolute z-10 rounded-full border flex items-center justify-center cursor-pointer transition-all duration-200 hover:scale-105 active:scale-95"
           style={{
-            top: '24px',
-            right: '20px',
+            top: window.navigator.standalone ? '60px' : '24px',
+            right: '24px',
             width: '56px',
             height: '56px',
             borderColor: '#404040',
@@ -589,9 +589,10 @@ function App() {
     };
 
     const handleShare = async () => {
+      const completedPattern = breathingPatterns[selectedPattern];
       const shareData = {
-        title: 'Natural Taoist Breath - Transform Your Mind in Minutes',
-        text: `🧘‍♂️ Just completed ${completedBreaths} breathing session${completedBreaths === 1 ? '' : 's'}!\n\n✨ Discovered the ancient art of Natural Taoist Breathing:\n• 4 seconds inhale → 6 seconds exhale\n• Instant calm & mental clarity\n• Reduces stress & anxiety naturally\n• Just minutes a day for profound results\n\n🌟 Experience the transformation yourself - try this free breathing app:`,
+        title: `${completedPattern.name} - Transform Your Mind in Minutes`,
+        text: `🧘‍♂️ Just completed ${completedBreaths} breathing session${completedBreaths === 1 ? '' : 's'}!\n\n✨ Discovered the ancient art of ${completedPattern.name}:\n• ${completedPattern.subtitle}\n• Instant calm & mental clarity\n• Reduces stress & anxiety naturally\n• Just minutes a day for profound results\n\n🌟 Experience the transformation yourself - try this free breathing app:`,
         url: 'https://taoistbreath.com'
       };
 
@@ -689,6 +690,9 @@ function App() {
       {/* Settings Icon */}
       <button 
         className="absolute top-6 right-6 w-14 h-14 border border-app-btn-stroke rounded-full bg-transparent text-app-headline flex items-center justify-center cursor-pointer transition-all duration-200 hover:bg-app-element-bg active:scale-95"
+        style={{
+          top: window.navigator.standalone ? '60px' : '24px'
+        }}
         onClick={handleSettings}
       >
         <img src="/images/slider.svg" alt="Settings" width="24" height="24" />
