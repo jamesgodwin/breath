@@ -84,3 +84,6 @@ pids
 # Storybook build outputs
 .out
 .storybook-out
+
+# Documentation - keep local only
+docs/
