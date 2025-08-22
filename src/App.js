@@ -50,7 +50,7 @@ function App() {
     naturalTaoist: {
       name: "Natural Taoist Breath",
       subtitle: "Inhale 4s → Exhale 6s",
-      description: "It's the most fundamental Taoist practice. Simple, calming, and safe for anyone.",
+      description: "The most fundamental Taoist practice. Simple and calming.",
       phases: [
         { type: 'inhale', duration: 4, text: 'Inhale' },
         { type: 'exhale', duration: 6, text: 'Exhale' }
@@ -70,7 +70,7 @@ function App() {
     embryonicBreathing: {
       name: "Embryonic Breathing (Huiyin focus)",
       subtitle: "Inhale 6s → Hold 2s → Exhale 6s → Hold 2s", 
-      description: "Classic Taoist rhythm for centring and longevity.",
+      description: "Classic Taoist rhythm for centring and focus.",
       phases: [
         { type: 'inhale', duration: 6, text: 'Inhale' },
         { type: 'hold', duration: 2, text: 'Hold' },
@@ -186,6 +186,7 @@ function App() {
     const [displayTimeLeft, setDisplayTimeLeft] = useState(selectedDuration);
     const [, setBreathCount] = useState(0);
     const [lastCompletedCycle, setLastCompletedCycle] = useState(-1);
+    const [holdCountdown, setHoldCountdown] = useState(null); // For countdown during hold phases
 
     const currentPattern = breathingPatterns[selectedPattern];
     const currentPhase = currentPattern.phases[currentPhaseIndex];
@@ -274,10 +275,24 @@ function App() {
         const phaseType = currentPattern.phases[targetPhaseIndex].type;
         if (phaseType === 'inhale') {
           setAnimationProgress(phaseProgress); // 0 to 1 (expand)
+          setHoldCountdown(null); // Clear countdown
         } else if (phaseType === 'exhale') {
           setAnimationProgress(1 - phaseProgress); // 1 to 0 (contract)
+          setHoldCountdown(null); // Clear countdown
         } else if (phaseType === 'hold') {
           // Hold at current position - don't change animationProgress
+          // Calculate countdown for hold phases: Hold, 3, 2, 1
+          const timeRemainingInPhase = currentPattern.phases[targetPhaseIndex].duration - phaseElapsedTime;
+          const phaseDuration = currentPattern.phases[targetPhaseIndex].duration;
+          
+          if (phaseElapsedTime < 1) {
+            // First second: show "Hold"
+            setHoldCountdown("Hold");
+          } else {
+            // Remaining seconds: show countdown 3,2,1
+            const countdown = Math.max(1, Math.ceil(timeRemainingInPhase));
+            setHoldCountdown(countdown);
+          }
         }
 
       }, 16); // ~60fps for smooth updates
@@ -368,7 +383,7 @@ function App() {
             }}
           >
             <span className="font-button font-bold text-lg text-white">
-              {currentPhase.text}
+              {currentPhase.type === 'hold' && holdCountdown !== null ? holdCountdown : currentPhase.text}
             </span>
           </div>
         </div>
@@ -661,12 +676,15 @@ function App() {
       </button>
 
       {/* Title Section */}
-      <div className="absolute top-1/4 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-40 text-center">
+      <div className="absolute top-1/4 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 text-center">
         <h1 className="font-headline font-semibold text-lg leading-none text-app-headline m-0">
-          Natural Taoist Breath
+          {breathingPatterns[selectedPattern].name}
         </h1>
-        <p className="font-body text-sm leading-5 text-app-body mt-2">
-          Inhale 4s → Exhale 6s
+        <p className="font-body text-xs leading-5 text-app-body mt-2 whitespace-nowrap">
+          {breathingPatterns[selectedPattern].subtitle}
+        </p>
+        <p className="font-body text-xs leading-4 text-app-body mt-2 px-4">
+          {breathingPatterns[selectedPattern].description}
         </p>
       </div>
 
