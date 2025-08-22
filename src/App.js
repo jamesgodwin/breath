@@ -4,8 +4,39 @@ import './App.css';
 function App() {
   const [selectedDuration, setSelectedDuration] = useState(60); // Default 1 minute in seconds
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [currentScreen, setCurrentScreen] = useState('start'); // 'start' | 'session' | 'complete'
+  const [currentScreen, setCurrentScreen] = useState('start'); // 'start' | 'session' | 'complete' | 'settings'
   const [selectedPattern] = useState('naturalTaoist');
+  
+  // Audio and haptic settings
+  const [audioEnabled, setAudioEnabled] = useState(() => {
+    try {
+      const saved = localStorage.getItem('taoistBreathAudioEnabled');
+      return saved ? JSON.parse(saved) : false;
+    } catch (error) {
+      return false;
+    }
+  });
+  
+  const [hapticEnabled, setHapticEnabled] = useState(() => {
+    try {
+      const saved = localStorage.getItem('taoistBreathHapticEnabled');
+      return saved ? JSON.parse(saved) : false;
+    } catch (error) {
+      return false;
+    }
+  });
+  
+  const [audioVolume, setAudioVolume] = useState(() => {
+    try {
+      const saved = localStorage.getItem('taoistBreathAudioVolume');
+      return saved ? parseFloat(saved) : 0.3;
+    } catch (error) {
+      return 0.3;
+    }
+  });
+  
+  // Audio context for sound generation
+  const [audioContext, setAudioContext] = useState(null);
   
   // Load completed sessions from localStorage on app start
   const [completedBreaths, setCompletedBreaths] = useState(() => {
@@ -26,6 +57,87 @@ function App() {
       console.log('Error saving sessions:', error);
     }
   }, [completedBreaths]);
+
+  // Save audio/haptic settings to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem('taoistBreathAudioEnabled', JSON.stringify(audioEnabled));
+    } catch (error) {
+      console.log('Error saving audio setting:', error);
+    }
+  }, [audioEnabled]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('taoistBreathHapticEnabled', JSON.stringify(hapticEnabled));
+    } catch (error) {
+      console.log('Error saving haptic setting:', error);
+    }
+  }, [hapticEnabled]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('taoistBreathAudioVolume', audioVolume.toString());
+    } catch (error) {
+      console.log('Error saving audio volume:', error);
+    }
+  }, [audioVolume]);
+
+  // Initialize audio context on first user interaction
+  const initializeAudioContext = () => {
+    if (!audioContext && audioEnabled) {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        setAudioContext(ctx);
+        return ctx;
+      } catch (error) {
+        console.log('Audio context not supported:', error);
+        return null;
+      }
+    }
+    return audioContext;
+  };
+
+  // Generate transition sound
+  const playTransitionSound = (frequency = 440, duration = 0.1) => {
+    if (!audioEnabled) return;
+    
+    const ctx = initializeAudioContext();
+    if (!ctx) return;
+
+    try {
+      const oscillator = ctx.createOscillator();
+      const gainNode = ctx.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(ctx.destination);
+      
+      oscillator.frequency.setValueAtTime(frequency, ctx.currentTime);
+      oscillator.type = 'sine';
+      
+      gainNode.gain.setValueAtTime(0, ctx.currentTime);
+      gainNode.gain.linearRampToValueAtTime(audioVolume * 0.1, ctx.currentTime + 0.01);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+      
+      oscillator.start(ctx.currentTime);
+      oscillator.stop(ctx.currentTime + duration);
+    } catch (error) {
+      console.log('Error playing sound:', error);
+    }
+  };
+
+  // Trigger haptic feedback
+  const triggerHaptic = () => {
+    if (!hapticEnabled) return;
+    
+    try {
+      if (navigator.vibrate) {
+        navigator.vibrate(50); // 50ms gentle vibration
+      }
+    } catch (error) {
+      console.log('Vibration not supported:', error);
+    }
+  };
 
   // Breathing patterns configuration
   const breathingPatterns = {
@@ -93,8 +205,7 @@ function App() {
   };
 
   const handleSettings = () => {
-    console.log('Opening settings');
-    // TODO: Navigate to settings screen
+    setCurrentScreen('settings');
   };
 
   // Simple viewport adjustment for mobile browsers
@@ -215,6 +326,17 @@ function App() {
 
         // Update phase if needed
         if (targetPhaseIndex !== currentPhaseIndex) {
+          const newPhase = currentPattern.phases[targetPhaseIndex];
+          const prevPhase = currentPattern.phases[currentPhaseIndex];
+          
+          // Trigger audio on phase transitions
+          if (newPhase.type === 'inhale') {
+            playTransitionSound(523, 0.15); // C5 note for inhale
+            triggerHaptic(); // Haptic feedback on inhale start
+          } else if (newPhase.type === 'exhale') {
+            playTransitionSound(392, 0.15); // G4 note for exhale
+          }
+          
           setCurrentPhaseIndex(targetPhaseIndex);
         }
 
@@ -392,6 +514,141 @@ function App() {
     );
   };
 
+  // Settings Screen Component
+  const SettingsScreen = () => {
+    const handleBack = () => {
+      setCurrentScreen('start');
+    };
+
+    const toggleAudio = () => {
+      setAudioEnabled(!audioEnabled);
+    };
+
+    const toggleHaptic = () => {
+      setHapticEnabled(!hapticEnabled);
+    };
+
+    const handleVolumeChange = (e) => {
+      setAudioVolume(parseFloat(e.target.value));
+    };
+
+    // Check if vibration is supported
+    const vibrationSupported = 'vibrate' in navigator;
+
+    return (
+      <div className="relative w-screen bg-app-bg overflow-hidden max-w-sm mx-auto md:border-x md:border-app-btn-stroke flex flex-col"
+           style={{ height: 'calc(var(--vh, 1vh) * 100)' }}>
+        
+        {/* Header */}
+        <div className="flex-none pt-6 pb-4 px-6 flex items-center">
+          <button
+            className="w-10 h-10 rounded-full border border-app-btn-stroke bg-transparent flex items-center justify-center cursor-pointer transition-all duration-200 hover:bg-app-element-bg active:scale-95"
+            onClick={handleBack}
+          >
+            <img src="/images/chevron-up.svg" alt="Back" width="16" height="16" style={{ transform: 'rotate(-90deg)' }} />
+          </button>
+          <h1 className="font-headline font-semibold text-xl text-app-headline ml-4">
+            Settings
+          </h1>
+        </div>
+
+        {/* Settings Content */}
+        <div className="flex-1 px-6 space-y-6">
+          
+          {/* Sound Settings */}
+          <div className="space-y-4">
+            <h2 className="font-headline font-medium text-lg text-app-headline">
+              Sound
+            </h2>
+            
+            {/* Audio Toggle */}
+            <div className="flex items-center justify-between">
+              <span className="font-body text-base text-app-body">
+                Transition Sounds
+              </span>
+              <button
+                className={`w-12 h-6 rounded-full border transition-all duration-200 ${
+                  audioEnabled 
+                    ? 'bg-app-btn-bg border-app-btn-bg' 
+                    : 'bg-app-element-bg border-app-btn-stroke'
+                }`}
+                onClick={toggleAudio}
+              >
+                <div
+                  className={`w-5 h-5 rounded-full bg-white transition-transform duration-200 ${
+                    audioEnabled ? 'translate-x-6' : 'translate-x-0.5'
+                  }`}
+                />
+              </button>
+            </div>
+
+            {/* Volume Control */}
+            {audioEnabled && (
+              <div className="space-y-2">
+                <label className="font-body text-sm text-app-body">
+                  Volume
+                </label>
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.1"
+                  value={audioVolume}
+                  onChange={handleVolumeChange}
+                  className="w-full h-2 bg-app-element-bg rounded-lg appearance-none cursor-pointer slider"
+                />
+              </div>
+            )}
+          </div>
+
+          {/* Haptic Feedback Settings */}
+          {vibrationSupported && (
+            <div className="space-y-4">
+              <h2 className="font-headline font-medium text-lg text-app-headline">
+                Haptic Feedback
+              </h2>
+              
+              <div className="flex items-center justify-between">
+                <span className="font-body text-base text-app-body">
+                  Vibrate on Inhale
+                </span>
+                <button
+                  className={`w-12 h-6 rounded-full border transition-all duration-200 ${
+                    hapticEnabled 
+                      ? 'bg-app-btn-bg border-app-btn-bg' 
+                      : 'bg-app-element-bg border-app-btn-stroke'
+                  }`}
+                  onClick={toggleHaptic}
+                >
+                  <div
+                    className={`w-5 h-5 rounded-full bg-white transition-transform duration-200 ${
+                      hapticEnabled ? 'translate-x-6' : 'translate-x-0.5'
+                    }`}
+                  />
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Pattern Info */}
+          <div className="space-y-4">
+            <h2 className="font-headline font-medium text-lg text-app-headline">
+              Current Pattern
+            </h2>
+            <div className="p-4 bg-app-element-bg border border-app-btn-stroke rounded-lg">
+              <h3 className="font-headline font-medium text-base text-app-btn-bg">
+                {breathingPatterns[selectedPattern].name}
+              </h3>
+              <p className="font-body text-sm text-app-body mt-1">
+                {breathingPatterns[selectedPattern].subtitle}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   // Session Completion Component
   const CompletionScreen = () => {
     const handleContinue = () => {
@@ -487,6 +744,10 @@ function App() {
 
   if (currentScreen === 'complete') {
     return <CompletionScreen />;
+  }
+
+  if (currentScreen === 'settings') {
+    return <SettingsScreen />;
   }
 
   return (
