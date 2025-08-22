@@ -348,11 +348,12 @@ function App() {
         <div className="absolute top-1/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
           {/* Outer Circle (Fixed) */}
           <div 
-            className="absolute rounded-full border-none"
+            className="absolute rounded-full border"
             style={{
               width: '300px',
               height: '300px',
-              backgroundColor: '#1A1A1A',
+              backgroundColor: '#232323',
+              borderColor: '#404040',
               left: '-150px',
               top: '-150px'
             }}
@@ -679,10 +680,10 @@ function App() {
         <h1 className="font-headline font-semibold text-lg leading-none text-app-headline m-0">
           {breathingPatterns[selectedPattern].name}
         </h1>
-        <p className="font-body text-xs leading-5 text-app-body mt-2 whitespace-nowrap">
+        <p className="font-body text-sm leading-5 text-app-body mt-2 whitespace-nowrap">
           {breathingPatterns[selectedPattern].subtitle}
         </p>
-        <p className="font-body text-xs leading-4 text-app-body mt-2 px-4">
+        <p className="font-body text-sm leading-5 text-app-body mt-2 px-4">
           {breathingPatterns[selectedPattern].description}
         </p>
       </div>
