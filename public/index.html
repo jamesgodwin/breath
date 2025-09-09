@@ -32,19 +32,23 @@
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href="https://taoistbreath.com/" />
     
-    <!-- Preconnect to Google Fonts for performance -->
+    <!-- Resource hints for performance -->
+    <link rel="dns-prefetch" href="https://taoistbreath.com" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     
-    <!-- Load fonts asynchronously to prevent render blocking -->
+    <!-- Load fonts after page render -->
     <script>
-      // Load Google Fonts asynchronously
-      (function() {
-        var link = document.createElement('link');
-        link.href = 'https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;600&family=Karla:wght@300;400;500&family=IBM+Plex+Mono:wght@400;500&display=swap';
-        link.rel = 'stylesheet';
-        document.head.appendChild(link);
-      })();
+      // Web Font Loader approach - load fonts after initial render
+      window.addEventListener('load', function() {
+        setTimeout(function() {
+          var link = document.createElement('link');
+          link.href = 'https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;600&family=Karla:wght@300;400;500&family=IBM+Plex+Mono:wght@400;500&display=swap';
+          link.rel = 'stylesheet';
+          link.media = 'all';
+          document.head.appendChild(link);
+        }, 100); // Small delay to ensure page is rendered
+      });
     </script>
     
     <!-- Favicons -->
@@ -122,8 +126,6 @@
       }
       .font-button {
         font-family: SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
-        background-color: #e5e5e5;
-        color: #141414;
       }
       /* Layout skeleton */
       .flex {
@@ -140,6 +142,31 @@
       }
       .text-center {
         text-align: center;
+      }
+      /* Common Tailwind utilities for initial render */
+      .w-full { width: 100%; }
+      .w-screen { width: 100vw; }
+      .h-full { height: 100%; }
+      .max-w-sm { max-width: 24rem; }
+      .mx-auto { margin-left: auto; margin-right: auto; }
+      .relative { position: relative; }
+      .absolute { position: absolute; }
+      .top-6 { top: 1.5rem; }
+      .right-6 { right: 1.5rem; }
+      .p-4 { padding: 1rem; }
+      .px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
+      .py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
+      .border { border-width: 1px; }
+      .rounded-full { border-radius: 9999px; }
+      .bg-transparent { background-color: transparent; }
+      .cursor-pointer { cursor: pointer; }
+      /* Loading animation for smooth transition */
+      .loading-fade {
+        animation: fadeIn 0.3s ease-in-out;
+      }
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
       }
     </style>
   </head>
