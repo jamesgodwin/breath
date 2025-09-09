@@ -17,9 +17,9 @@ module.exports = {
         }
       },
       fontFamily: {
-        headline: ['EB Garamond', 'serif'],
-        body: ['Karla', 'sans-serif'],
-        button: ['IBM Plex Mono', 'monospace']
+        headline: ['EB Garamond', 'Georgia', 'Times New Roman', 'serif'],
+        body: ['Karla', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        button: ['IBM Plex Mono', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'Courier New', 'monospace']
       }
     },
   },
