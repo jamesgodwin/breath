@@ -87,3 +87,5 @@ pids
 
 # Documentation - keep local only
 docs/
+# Browser test reports and screenshots
+/output/playwright/

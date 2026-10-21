@@ -545,7 +545,7 @@ function App() {
         >
           
           {/* Breathing Exercise Cards */}
-          <div style={{ width: '342px' }}>
+          <div style={{ width: '100%', maxWidth: '342px' }}>
             {Object.entries(breathingPatterns).map(([key, pattern], index) => (
               <div
                 key={key}
@@ -710,7 +710,7 @@ function App() {
          style={{ height: 'calc(var(--vh, 1vh) * 100)' }}>
       {/* Settings Icon */}
       <button 
-        className="absolute top-6 right-6 w-14 h-14 border border-app-btn-stroke rounded-full bg-transparent text-app-headline flex items-center justify-center cursor-pointer transition-all duration-200 hover:bg-app-element-bg active:scale-95"
+        className="absolute z-10 top-6 right-6 w-14 h-14 border border-app-btn-stroke rounded-full bg-transparent text-app-headline flex items-center justify-center cursor-pointer transition-all duration-200 hover:bg-app-element-bg active:scale-95"
         style={{
           top: window.navigator.standalone ? '60px' : '24px'
         }}

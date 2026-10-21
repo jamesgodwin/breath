@@ -188,3 +188,13 @@ This app is designed for educational and wellness purposes. The breathing techni
 Netlify builds the `main` branch with Node 22.23.4, runs `npm test`, then publishes Vite's `build/` directory. `.npmrc` enforces the exact Node engine; run `nvm use` before installing dependencies. The regression suite covers saved settings, phase timing, pause/resume, backgrounding, stopping, completion counts and restarting.
 
 The Vite security migration was published as `d2b1ffb` on 21 October 2026. Netlify confirmed production publication, and the live JS/CSS matched the tested build. Browser checks verified a completed breathing session and saved-duration restoration. The existing manifest references a missing 512px icon; physical iOS testing remains separate from these Chromium checks.
+
+### Mobile browser tests
+
+Run `npm run test:e2e` after `npx playwright install chromium webkit`.
+The suite builds the app and tests iPhone/WebKit, Android/Chromium and a
+320px-wide phone, with isolated browser storage. It covers scrolling and
+saved settings, touch pause/resume, completion counting, and landscape
+navigation. Timer tests use Playwright's controlled clock. Reports,
+screenshots and failure traces are written to `output/playwright/`.
+These checks emulate phones; physical-device acceptance remains separate.
