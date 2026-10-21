@@ -1,9 +1,8 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-/* Import Google Fonts */
 @import url('https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;600&family=Karla:wght@400&family=IBM+Plex+Mono:wght@700&display=swap');
+
+@import "tailwindcss";
+@config "../tailwind.config.cjs";
+
 
 @layer base {
   body {

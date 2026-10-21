@@ -5,7 +5,7 @@
 A modern React-based breathing meditation app that brings the ancient wisdom of Taoist breathing techniques to your fingertips. Experience instant calm, mental clarity, and stress relief through scientifically-backed breathing patterns.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![React](https://img.shields.io/badge/React-19.1.1-blue.svg)](https://reactjs.org/)
+[![React](https://img.shields.io/badge/React-19.3.1-blue.svg)](https://reactjs.org/)
 [![PWA](https://img.shields.io/badge/PWA-Ready-green.svg)](https://web.dev/progressive-web-apps/)
 
 ## 🌟 Live Demo
@@ -43,7 +43,8 @@ git clone https://github.com/yourusername/breath.git
 cd breath
 
 # Install dependencies
-npm install
+nvm use
+npm ci
 
 # Start development server
 npm start
@@ -52,12 +53,12 @@ npm start
 npm run build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to view the app in your browser.
+Open [http://localhost:5173](http://localhost:5173) to view the app in your browser.
 
 ## 🛠️ Development
 
 ### Prerequisites
-- Node.js (version 16 or higher recommended)
+- Node.js 22.23.4 (`nvm use`; also pinned for Netlify)
 - npm or yarn package manager
 
 ### Available Scripts
@@ -65,17 +66,18 @@ Open [http://localhost:3000](http://localhost:3000) to view the app in your brow
 | Command | Description |
 |---------|-------------|
 | `npm start` | Runs the app in development mode |
-| `npm test` | Launches the test runner |
+| `npm test` | Runs the timer and saved-settings regression tests once |
+| `npm run test:watch` | Watches regression tests during development |
+| `npm run preview` | Serves the production build locally |
 | `npm run build` | Builds the app for production |
-| `npm run eject` | Ejects from Create React App (one-way operation) |
 
 ### Project Structure
 
 ```
 src/
-├── App.js          # Main application component (single-file architecture)
+├── App.jsx          # Main application component (single-file architecture)
 ├── App.css         # Custom styles and Tailwind overrides
-├── index.js        # React DOM rendering
+├── index.jsx        # React DOM rendering
 └── index.css       # Global styles and Tailwind imports
 
 public/
@@ -86,15 +88,15 @@ public/
 
 ## 🏗️ Technical Architecture
 
-- **Framework**: React 19.1.1 with functional components and hooks
-- **Styling**: Tailwind CSS 3.4.17 with custom design system
+- **Framework**: React 19.3.1 with functional components and hooks
+- **Styling**: Tailwind CSS 4.3.3 with custom design system
 - **State Management**: React hooks with localStorage persistence
-- **Build Tool**: Create React App with zero-configuration setup
-- **PWA**: Service worker and manifest for app-like experience
+- **Build Tool**: Vite 8 with React and Vitest
+- **PWA**: Web app manifest for standalone installation (no service worker)
 
 ### Key Design Decisions
 
-- **Single Component Architecture**: Entire app in `src/App.js` for simplicity and performance
+- **Single Component Architecture**: Entire app in `src/App.jsx` for simplicity and performance
 - **Precise Timing**: Uses `Date.now()` instead of intervals for sub-second accuracy
 - **Mobile-First**: Responsive design optimized for smartphone usage
 - **Minimal Dependencies**: Leverages browser APIs over external libraries
